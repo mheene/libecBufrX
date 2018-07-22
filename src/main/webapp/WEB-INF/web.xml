@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+			     http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	 version="3.0">
+  <display-name>ExecutorServelt</display-name>
+
+
+  <servlet>
+    <display-name>ExecutorServlet</display-name>
+    <servlet-name>ExecutorServlet</servlet-name>
+    <servlet-class>ExecutorServlet</servlet-class>
+    <load-on-startup>0</load-on-startup>
+      <init-param>
+            <param-name>storeFiles</param-name>
+            <param-value>false</param-value>
+      </init-param>
+      <init-param>
+            <param-name>executableRelativePath</param-name>
+            <param-value>WEB-INF/resource/bin/bufr_decoder</param-value>
+      </init-param>
+      <init-param>
+            <param-name>cmdArgsCommaSeparated</param-name>
+            <param-value>-verbose,-inbufr</param-value>
+      </init-param>
+      <init-param>
+            <param-name>envKey</param-name>
+            <param-value>BUFR_TABLES</param-value>
+      </init-param>
+      <init-param>
+            <param-name>envValue</param-name>
+            <param-value>WEB-INF/resource/tables</param-value>
+      </init-param>
+
+
+      <!--
+      <init-param>
+            <param-name>proxyHost</param-name>
+            <param-value>my.proxy.server</param-value>
+      </init-param>
+      <init-param>
+            <param-name>proxyPort</param-name>
+            <param-value>proxy.port</param-value>
+      </init-param>
+-->
+
+  </servlet>
+   
+  <servlet-mapping>
+    <servlet-name>ExecutorServlet</servlet-name>
+    <url-pattern>/uploadFile</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>upload</servlet-name>
+    <jsp-file>/WEB-INF/jsp/upload.jsp</jsp-file>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>upload</servlet-name>
+    <url-pattern>/upload</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>json</servlet-name>
+    <jsp-file>/WEB-INF/jsp/json.jsp</jsp-file>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>json</servlet-name>
+    <url-pattern>/json</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>text</servlet-name>
+    <jsp-file>/WEB-INF/jsp/text.jsp</jsp-file>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>text</servlet-name>
+    <url-pattern>/text</url-pattern>
+  </servlet-mapping>
+
+
+  <servlet>
+    <servlet-name>error</servlet-name>
+    <jsp-file>/WEB-INF/jsp/error.jsp</jsp-file>
+      <init-param>
+            <param-name>debug</param-name>
+            <param-value>false</param-value>
+      </init-param>
+  </servlet>
+
+<!--
+  <filter>
+        <filter-name>Request Dumper Filter</filter-name>
+        <filter-class>org.apache.catalina.filters.RequestDumperFilter</filter-class>
+  </filter>
+  
+  <filter-mapping>
+        <filter-name>Request Dumper Filter</filter-name>
+        <url-pattern>/*</url-pattern>
+  </filter-mapping>
+-->
+  <welcome-file-list>
+    <welcome-file>upload</welcome-file>
+  </welcome-file-list>
+
+  <error-page>
+    <exception-type>java.lang.Throwable</exception-type>
+    <location>/error</location>
+  </error-page>
+
+  <error-page>
+    <location>/error</location>
+  </error-page>
+
+
+</web-app>
