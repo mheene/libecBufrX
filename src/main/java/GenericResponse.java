@@ -1,7 +1,7 @@
 public class GenericResponse {
 
-  public String error;
-  public boolean status;
+  private String error;
+  private boolean status;
 
   public GenericResponse(String error, boolean status) {
     this.error = error;

@@ -1,5 +1,3 @@
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,16 +13,21 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * A Java servlet that handles file upload from client.
@@ -42,20 +45,22 @@ public class ExecutorServlet extends HttpServlet {
   private static final int MAX_FILE_SIZE = 1024 * 1024 * 10; // 10 MB
   private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 20; // 20 MB
 
-  // private Executor executor;
+
   private static final ExecutorService executor = Executors.newFixedThreadPool(20);
 
-  public String installPath = null;
-  public String cmd = null;
-  public List<String> args = new ArrayList<String>();
-  public HashMap<String, String> env = new HashMap<String, String>();
+  private String installPath = "";
+  private String cmd = "";
+  private List<String> args = new ArrayList<>();
+  private HashMap<String, String> env = new HashMap<>();
 
+@Override
   public void destroy() {
     super.destroy();
     System.out.println("Destroy: call");
     executor.shutdown();
   }
 
+@Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
     System.out.println("Init: call");
@@ -70,10 +75,11 @@ public class ExecutorServlet extends HttpServlet {
     String webXmlArgs = getServletConfig().getInitParameter("cmdArgsCommaSeparated");
     System.out.println("webXmlArgs: " + webXmlArgs);
     String[] parts = webXmlArgs.split(",");
+    
     for (int i = 0; i < parts.length; i++) {
       args.add(parts[i]);
     }
-    // args = Arrays.asList(parts);
+
     String key = getServletConfig().getInitParameter("envKey");
     System.out.println("envKey: " + key);
     String value = installPath + getServletConfig().getInitParameter("envValue");
@@ -103,6 +109,7 @@ public class ExecutorServlet extends HttpServlet {
    * Upon receiving file upload submission, parses the request to read upload data and saves the
    * file on disk.
    */
+@Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     // checks if the request actually contains upload file
@@ -154,7 +161,7 @@ public class ExecutorServlet extends HttpServlet {
       }
     }
 
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     File tempFile = null;
     long startOverallResponseTime = System.currentTimeMillis();
     long endOverallResponseTime = -1;
@@ -165,15 +172,13 @@ public class ExecutorServlet extends HttpServlet {
       // @SuppressWarnings("unchecked")
       List<FileItem> formItems = upload.parseRequest(request);
       String fileName = null;
-      long fileSize = -1;
-
+    
       if (formItems != null && formItems.size() > 0) {
         // iterates over form's fields
         for (FileItem item : formItems) {
           // processes only fields that are not form fields
           if (!item.isFormField()) {
             fileName = item.getName();
-            fileSize = item.getSize();
             if (Boolean.valueOf(getServletConfig().getInitParameter("storeFiles"))) {
               String filePath = uploadPath + File.separator + fileName;
               File storeFile = new File(filePath);
@@ -192,45 +197,19 @@ public class ExecutorServlet extends HttpServlet {
 
             System.out.println("getCanonicalPath: " + tempFile.getCanonicalPath());
 
-            // HashMap <String, DecoderResponse> responseMap = new HashMap<String,
-            // DecoderResponse>();
-            // executor = Executors.newFixedThreadPool(4);
-
             List<CmdTask> tasks = new ArrayList<CmdTask>();
 
-            // String cmd = "/data/mheene/progs/libecbufr/bin/bufr_decoder";
-
-            // List<String> args = new ArrayList<String>();
-
-            // args.add("-verbose");
-            // args.add("-inbufr");
 	    List<String> cmdArgs = new ArrayList<String>(args);
             cmdArgs.add(tempFile.getCanonicalPath());
-            // HashMap<String, String> env = new HashMap<String, String>();
-            // env.put("LIBDWD_BUFRTABLE_PATH_V3",
-            // "/data/mheene/install/libdwd/dat/bufr/tabellen_v3");
-            // env.put("LIBDWD_BUFRTABLE_PATH_V3", installPath +
-            // "WEB-INF/resource/dat/bufr/tabellen_v3");
-            // env.put("BUFR_TABLES", "/data/mheene/progs/libecbufr/tables");
             tasks.add(new CmdTask("libecbufr", this.cmd, cmdArgs, this.env, executor));
-            // tasks.add(new CmdTask("readbufrx", cmd, args ,env, executor));
-            // now wait for all async tasks to complete
-            // System.out.println("Path: " );
             while (!tasks.isEmpty()) {
               for (Iterator<CmdTask> it = tasks.iterator(); it.hasNext(); ) {
 
                 CmdTask task = it.next();
                 if (task.isDone()) {
-
-                  // sb.append("Decoder: " + task.getDecoder() + "\n");
-                  // sb.append("Output: " + task.getOutput() + "\n");
-                  // sb.append("Error: " + task.getError() + "\n");
-                  // sb.append("Code: " + task.getReturnCode() + "\n");
                   sb.append(task.getOutput());
                   returnCode = (task.getReturnCode().intValue());
                   errorMessage = task.getError();
-                  // responseMap.put(task.getDecoder(),new
-                  // DecoderResponse(p_response,p_responseTime));
                   it.remove();
                 }
               }
@@ -239,10 +218,6 @@ public class ExecutorServlet extends HttpServlet {
             }
             // now you have all responses for all async requests
             endOverallResponseTime = System.currentTimeMillis();
-            // Result result = new Result(fileName, fileSize, md5ChkSum, 1,endOverallResponseTime -
-            // startOverallResponseTime);
-            // result = processResponse(result, responseMap);
-            // request.setAttribute("bufr", StringEscapeUtils.escapeHtml4(sb.toString()));
             boolean tempFileDeleted = tempFile.delete();
             System.out.println("Executor Deleted tempFile: " + tempFileDeleted);
             System.out.println("Executor: " + sb.toString().length());
@@ -298,11 +273,4 @@ public class ExecutorServlet extends HttpServlet {
       getServletContext().getRequestDispatcher("/error").forward(request, response);
     }
   }
-
-  /*
-    public void processResponse (Result p_result, HashMap<String,DecoderResponse> p_mapResponse) {
-    Result result = p_result;
-    }
-  */
-
 }

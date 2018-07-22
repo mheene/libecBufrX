@@ -38,3 +38,6 @@ bin/
 .classpath
 .project
 .settings/
+
+# sonarQube
+sonarQube.sh
