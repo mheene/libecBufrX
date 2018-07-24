@@ -61,8 +61,19 @@ gretty {
   // supported values:
   // 'jetty7', 'jetty8', 'jetty9', 'jetty93', 'jetty94', 'tomcat7', 'tomcat8', 'tomcat9'
   servletContainer = 'tomcat9'
+  //integrationTestTask = 'integrationTest'	
 }
 
+/*
+task curl(type: Exec) {
+  executable "bash"
+  args "-c", "src/test/sh/poster_01_json.sh"
+}
+
+task integrationTest(dependsOn appRun) {
+     tasks.curl.execute()  
+}
+*/
 
 dependencies {
     compile 'com.google.code.gson:gson:2.8.5'
@@ -80,4 +91,8 @@ dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0' 
     testCompile 'org.mockito:mockito-core:2.7.19'
     testCompile 'junit:junit:4.12'
+}
+
+task stage {
+  dependsOn installDist
 }
