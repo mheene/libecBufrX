@@ -1,6 +1,6 @@
 plugins {
     id 'war'
-    id 'org.gretty' version '2.2.0'
+    id 'org.gretty' version '2.1.0'
     id 'org.sonarqube' version '2.6'
 }
 
