@@ -1,6 +1,6 @@
 plugins {
     id 'war'
-    id 'org.gretty' version '2.1.0'
+    id 'org.gretty' version '2.2.0'
     id 'org.sonarqube' version '2.6'
 }
 
@@ -93,7 +93,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-
+/*
 task stage(dependsOn: ['build', 'clean']) {
      build.mustRunAfter clean
 }
@@ -104,3 +104,4 @@ task copyToLib(type: Copy) {
 }
 
 stage.dependsOn(copyToLib)
+*/

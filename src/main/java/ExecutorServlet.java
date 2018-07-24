@@ -321,12 +321,16 @@ public class ExecutorServlet extends HttpServlet {
 			}
 		} else if (outputFormat.equals("json")) {
 			GenericResponse rrb = null;
-			if (returnCode == 1) {
-				rrb = new GenericResponse(null, true);
+			// Parse response
+			//log.info("Return Code: " + returnCode);
+			//log.info(sb.toString());
+			if (sb.toString().contains("Error: can't decode messages") || returnCode != 0) {
+			    //log.info("Found Error"); 
+			    	rrb = new GenericResponse(errorMessage, false);
 			} else {
-				rrb = new GenericResponse(errorMessage, false);
+			    //log.info("Ok");
+			    rrb = new GenericResponse(null, true);
 			}
-
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			String jsonResponseString = gson.toJson(rrb);
 			response.setContentType("application/json; charset=UTF-8");
