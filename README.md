@@ -1,5 +1,5 @@
 # libecBufrX
-The software libecBufrX wraps the BUFR decoder libecBUFR developed by the Meteorological Service of Canada into a servlet.
+The software libecBufrX wraps the BUFR decoder (libecBUFR)[https://launchpad.net/libecbufr] developed by the Meteorological Service of Canada into a servlet.
 
 An online demonstrator is available [here](http://dev-bufr.1d35.starter-us-east-1.openshiftapps.com/libecBufrX/).
 
